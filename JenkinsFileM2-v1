@@ -1,0 +1,80 @@
+pipeline {
+	agent {
+		node {
+			label "centos7-nodejs"
+		}
+	}
+	stages{
+		stage('checkout-Code'){
+			steps {
+				checkout([$class: 'GitSCM', branches: [[name: 'YoavGuez_sol']], extensions: [], userRemoteConfigs: [[credentialsId: 'GitHub', url: 'https://github.com/YoavGUEZfromBYNET/spring-boot-examples.git']]])
+				sleep 2
+			}
+		}
+		stage('Build by MAVEN: Compile & Test') {
+            steps {
+                sh '''cd spring-boot-package-war && pwd && mvn clean package'''
+                sleep 5
+            }
+        }
+        stage('Deploy WAR on Remote Tomcat to Integration ') {
+            steps {
+                sh ' scp /home/jenkins/jenkins/workspace/$JOB_NAME/spring-boot-package-war/target/spring-boot-package-war-*-SNAPSHOT.war jenkins@10.10.10.2:/opt/tomcat/latest/webapps'
+            }
+        }
+	    stage('POM version increment') {
+            steps {
+                sh '''cd spring-boot-package-war && mvn build-helper:parse-version versions:set -DnewVersion=\'${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}\'.$BUILD_ID-SNAPSHOT versions:commit &&
+               cat pom.xml | grep 'SNAP' >version.txt
+               ygversion=`cat pom.xml | grep 'SNAP'`
+               '''
+            }
+        }
+        stage('GIT Commit & TAG increment') {
+            steps {
+                sh '''git config --global user.name "YG" &&
+                git config --global user.email "yoav-g@bynet.co.il" &&
+                git config -l &&
+                git add ./ && 
+                git tag -a "JENKINS_YG-$BUILD_ID" HEAD -m "YG-Jenkins AUTOMATIC TAG" &&
+                git commit -m "YG-Jenkins AUTOMATIC COMMIT" &&
+                git --version'''
+            }
+        }
+        stage('GIT PUSH') {
+            steps {
+                withCredentials([gitUsernamePassword(credentialsId: 'GitHub', gitToolName: 'git-tool')]) {
+                sh '''
+                git config --global push.default matching &&
+                git push --tags &&
+                git push origin HEAD:YoavGuez_sol'''
+                /* git config --global push.default matching
+                
+                ''' */
+                    }
+                }
+            }
+        stage('Slack Send') {
+            steps {
+            sleep 1
+            slackSend channel: 'yg-channel-private', color: '#3EA652', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} - Started By YG (${env.BUILD_URL})"
+            slackUploadFile channel: 'yg-channel-private', filePath: 'spring-boot-package-war/version.txt'           
+            /* slackUploadFile channel: 'yg-channel-private' + slackResponse.ts, filePath: "./version.txt", initialComment:  "A file, inside a thread."
+            
+             GIT_CREDS = credentials(GitHub)
+                withCredentials(bindings: [sshUserPrivateKey(credentialsId: 'GitHub', keyFileVariable: 'key')]) {
+                sh '''
+                /* GIT_SSH_COMMAND = "ssh -i $key"
+                git push https://github.com/YoavGUEZfromBYNET/spring-boot-examples.git JENKINS_YG-$BUILD_ID 
+                git push https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@bitbucket.org/<your repo>.git YoavGuez_sol
+            
+            */
+          }
+        }
+        stage('Cleaning Workspace') {
+            steps {
+            cleanWs()
+          }
+        }    
+	}
+}
