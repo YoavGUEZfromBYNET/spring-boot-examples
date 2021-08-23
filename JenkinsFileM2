@@ -63,7 +63,7 @@ pipeline {
             sleep 1
             slackSend channel: 'yg_only', color: '#3EA652', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} - Started By YG (${env.BUILD_URL})"
             slackUploadFile channel: 'yg_only', filePath: 'spring-boot-package-war/version.txt'
-            slackUploadFile channel: 'yg_only', filePath: 'spring-boot-package-war/log_${BUILD_NUMBER}.txt'
+            slackUploadFile channel: 'yg_only', filePath: 'spring-boot-package-war/log_${env.BUILD_NUMBER}.txt'
             /* slackUploadFile channel: 'yg-channel-private' + slackResponse.ts, filePath: "./version.txt", initialComment:  "A file, inside a thread."
             
              GIT_CREDS = credentials(GitHub)
