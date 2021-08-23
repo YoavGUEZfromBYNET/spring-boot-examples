@@ -49,7 +49,7 @@ pipeline {
                 git push --tags &&
                 git push -f origin HEAD:YoavGuez_sol
 				pwd
-				scp jenkins@10.10.10.2:${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log /home/jenkins/jenkins/workspace/$JOB_NAME/spring-boot-package-war/log.txt
+				scp jenkins@10.10.10.2:${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log /home/jenkins/jenkins/workspace/$JOB_NAME/spring-boot-package-war/log_${BUILD_NUMBER}.txt
 				'''
                 /* git config --global push.default matching
 				cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log > log.txt
