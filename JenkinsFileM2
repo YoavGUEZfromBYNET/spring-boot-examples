@@ -48,6 +48,7 @@ pipeline {
                 git config --global push.default matching &&
                 git push --tags &&
                 git push -f origin HEAD:YoavGuez_sol
+				pwd
 				cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log > log.txt
 				'''
                 /* git config --global push.default matching
