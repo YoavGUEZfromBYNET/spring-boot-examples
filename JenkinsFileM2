@@ -49,8 +49,7 @@ pipeline {
                 git push --tags &&
                 git push -f origin HEAD:YoavGuez_sol
 				pwd
-				scp jenkins@10.10.10.2:${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log /home/jenkins/jenkins/workspace/$JOB_NAME/spring-boot-package-war/log_${BUILD_NUMBER}.txt
-				
+				scp jenkins@10.10.10.2:${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log /home/jenkins/jenkins/workspace/$JOB_NAME/spring-boot-package-war/log.txt
 				'''
                 /* git config --global push.default matching
 				cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log > log.txt
@@ -62,8 +61,8 @@ pipeline {
             steps {
             sleep 1
             slackSend channel: 'yg_only', color: '#3EA652', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} - Started By YG (${env.BUILD_URL})"
-            slackUploadFile channel: 'yg_only', filePath: 'spring-boot-package-war/log_${env.BUILD_NUMBER}.txt'
-            slackUploadFile channel: 'yg_only', filePath: 'spring-boot-package-war/log_${env.BUILD_NUMBER}.txt'
+            slackUploadFile channel: 'yg_only', filePath: 'spring-boot-package-war/log.txt'
+            slackUploadFile channel: 'yg_only', filePath: 'spring-boot-package-war/version.txt'
             /* slackUploadFile channel: 'yg-channel-private' + slackResponse.ts, filePath: "./version.txt", initialComment:  "A file, inside a thread."
             
              GIT_CREDS = credentials(GitHub)
