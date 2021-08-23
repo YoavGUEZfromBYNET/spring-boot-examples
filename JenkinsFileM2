@@ -47,9 +47,10 @@ pipeline {
                 sh '''
                 git config --global push.default matching &&
                 git push --tags &&
-                git push -f origin HEAD:YoavGuez_sol'''
+                git push -f origin HEAD:YoavGuez_sol
+				cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log > log.txt
+				'''
                 /* git config --global push.default matching
-                
                 ''' */
                     }
                 }
@@ -59,7 +60,7 @@ pipeline {
             sleep 1
             slackSend channel: 'yg-channel-private', color: '#3EA652', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} - Started By YG (${env.BUILD_URL})"
             slackUploadFile channel: 'yg-channel-private', filePath: 'spring-boot-package-war/version.txt'
-			slackUploadFile channel: 'yg-channel-private', filePath: '${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log'
+			slackUploadFile channel: 'yg-channel-private', filePath: 'spring-boot-package-war/log.txt'
             /* slackUploadFile channel: 'yg-channel-private' + slackResponse.ts, filePath: "./version.txt", initialComment:  "A file, inside a thread."
             
              GIT_CREDS = credentials(GitHub)
