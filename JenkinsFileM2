@@ -78,7 +78,7 @@ pipeline {
         }
         stage('Cleaning Workspace') {
             steps {
-            echo cleanWs()
+            sh '''echo will clean after debug ''' /* cleanWs() */
           }
         }    
 	}
