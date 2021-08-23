@@ -17,17 +17,17 @@ pipeline {
                 sleep 5
             }
         }
-        stage('Deploy WAR on Remote Tomcat to Integration ') {
-            steps {
-                sh ' scp /home/jenkins/jenkins/workspace/$JOB_NAME/spring-boot-package-war/target/spring-boot-package-war-*-SNAPSHOT.war jenkins@10.10.10.2:/opt/tomcat/latest/webapps'
-            }
-        }
 	    stage('POM version increment') {
             steps {
                 sh '''cd spring-boot-package-war && mvn build-helper:parse-version versions:set -DnewVersion=\'${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}\'.$BUILD_ID-SNAPSHOT versions:commit &&
                cat pom.xml | grep 'SNAP' >version.txt
                ygversion=`cat pom.xml | grep 'SNAP'`
                '''
+            }
+        }
+		stage('Deploy WAR on Remote Tomcat to Integration ') {
+            steps {
+                sh 'scp /home/jenkins/jenkins/workspace/$JOB_NAME/spring-boot-package-war/target/spring-boot-package-war-*-SNAPSHOT.war jenkins@10.10.10.2:/opt/tomcat/latest/webapps'
             }
         }
         stage('GIT Commit & TAG increment') {
@@ -53,16 +53,16 @@ pipeline {
 				'''
                 /* git config --global push.default matching
 				cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log > log.txt
-                ''' */
+                */
                     }
                 }
             }
         stage('Slack Send') {
             steps {
             sleep 1
-            slackSend channel: 'yg-channel-private', color: '#3EA652', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} - Started By YG (${env.BUILD_URL})"
-            slackUploadFile channel: 'yg-channel-private', filePath: 'spring-boot-package-war/version.txt'
-			slackUploadFile channel: 'yg-channel-private', filePath: 'spring-boot-package-war/log.txt'
+            slackSend channel: 'yg_only', color: '#3EA652', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} - Started By YG (${env.BUILD_URL})"
+            slackUploadFile channel: 'yg_only', filePath: 'spring-boot-package-war/version.txt'
+			slackUploadFile channel: 'yg_only', filePath: 'spring-boot-package-war/log.txt'
             /* slackUploadFile channel: 'yg-channel-private' + slackResponse.ts, filePath: "./version.txt", initialComment:  "A file, inside a thread."
             
              GIT_CREDS = credentials(GitHub)
